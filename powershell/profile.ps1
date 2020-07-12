@@ -16,6 +16,8 @@ function prompt() {
         $totalUnstagedModified = (git diff --name-only --diff-filter=M | Measure-Object -line).Lines
         # Get deleted files not in index
         $totalUnstagedDeleted = (git diff --name-only --diff-filter=D | Measure-Object -line).Lines
+        # Get conflicted files
+        $totalConflicted = (git diff --name-only --diff-filter=U| Measure-Object -line).Lines
 
         # Get the name of the remote branch
         $remote = (git rev-parse --abbrev-ref --symbolic-full-name '@{u}') 2> $null
@@ -43,6 +45,11 @@ function prompt() {
                 # Get deleted files not in index
                 $totalUnstagedDeleted = (git diff --name-only --diff-filter=D | Measure-Object -line).Lines
                 Write-Host "+$($totalUnstagedAdded) ~$($totalUnstagedModified) -$($totalUnstagedDeleted)" -ForegroundColor red -nonewline
+
+                if ($totalConflicted -gt 0) {
+                    Write-Host " !$($totalConflicted)" -ForegroundColor red -nonewline
+                }
+
             }
         Write-Host "]" -nonewline
 
